@@ -1,0 +1,11 @@
+.films-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.film {
+    max-width: 600px;
+    margin: 20px;
+    width: 50%;
+}
