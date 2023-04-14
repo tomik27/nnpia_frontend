@@ -4,5 +4,6 @@ export interface FilmProps {
     path_to_image: string;
     genre: string;
     releaseYear: number;
-    index:number;
+    index?: number; // make index optional
+
 }

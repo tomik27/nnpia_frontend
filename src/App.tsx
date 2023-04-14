@@ -1,11 +1,16 @@
 import React from 'react';
-import Films from "./page/Films";
-import HomePage from "./page/HomePage";
+import Films from "./page/Film/Films";
+import HomePage from "./page/Home/HomePage";
+import NavigationBar from "./page/Home/NavigationBar";
+import RoutesComponent from "./page/Home/Routes";
 
 function App() {
+    const handleLogout = () => {
+        // logika pro odhlášení uživatele
+    };
     return (
         <div className="App">
-            <HomePage/>
+            <RoutesComponent onLogout={handleLogout} />
         </div>
     );
 }
