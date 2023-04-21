@@ -9,6 +9,7 @@ interface RegisterProps {
     email: string;
     username: string;
     password: string;
+    repeatPassword:string;
 }
 
 const RegisterForm: React.FC<RegisterProps> = ({
@@ -17,10 +18,10 @@ const RegisterForm: React.FC<RegisterProps> = ({
                                                    email,
                                                    username,
                                                    password,
+    repeatPassword
                                                }) => {
     return (
         <form onSubmit={handleRegister}>
-            <Paper elevation={10}>
                 <Grid container direction="column" alignItems="center" spacing={3}>
                     <Grid item>
                         <Typography variant="h4">Register</Typography>
@@ -56,12 +57,21 @@ const RegisterForm: React.FC<RegisterProps> = ({
                         />
                     </Grid>
                     <Grid item>
+                        <TextField
+                            label="repeatPassword"
+                            variant="outlined"
+                            type="password"
+                            name="repeatPassword"
+                            value={repeatPassword}
+                            onChange={handleInputChange}
+                        />
+                    </Grid>
+                    <Grid item>
                         <Button type="submit" color="primary" variant="contained">
                             Register
                         </Button>
                     </Grid>
                 </Grid>
-            </Paper>
         </form>
     );
 };

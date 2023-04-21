@@ -53,9 +53,9 @@ const MovieNavbar: React.FC<MovieNavbarProps> = () => {
                     <ListItemIcon>
                         <MovieIcon />
                     </ListItemIcon>
-                    <ListItemText primary="Filmy" />
+                    <ListItemText primary="Přidat film" />
                 </ListItem>
-                <ListItem button component={RouterLink} to="/actors">
+                <ListItem button component={RouterLink} to="/filmForm">
                     <ListItemIcon>
                         <PersonIcon />
                     </ListItemIcon>

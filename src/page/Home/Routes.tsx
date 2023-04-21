@@ -12,12 +12,15 @@ import MovieNavbar from "./MovieNavbar";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
 import {RootState} from "../../app/store";
 import {logout} from "../../features/login/loginSlice";
+import Person from "../Person/Person";
+import FilmForm from '../Film/FilmForm';
+import PersonForm from "../Person/PersonForm";
+import UserForm from "../User/UserForm";
+import AddPersonToFilmForm from "../Film/AddPersonToFilmForm";
 
 interface Props {
     onLogout: () => void;
 }
-
-
 
 const RoutesComponent: React.FC<Props> = ({ onLogout }) => {
     const dispatch = useAppDispatch();
@@ -39,16 +42,14 @@ const RoutesComponent: React.FC<Props> = ({ onLogout }) => {
                 <Route path="/persons" element={<PersonsWithPadding />} />
                 <Route path="/account" element={<UserProfile  email={"mail.com"} favoriteFilms={["The Shawshank Redemption", "The Godfather"]} username={''}/>} />
                 <Route path="/authentication" element={<AuthWithPadding/>} />
+                <Route  path='/person/:id' element={<Person/>}/>
+                <Route  path='/filmForm' element={<FilmForm/>}/>
+                <Route  path='/personForm' element={<PersonForm/>}/>
+                <Route  path='/userForm' element={<UserForm/>}/>
+                <Route  path='/addPersonToFilmForm' element={<AddPersonTofilmWithPadding/>}/>
+
             </Routes>
         </BrowserRouter>
-    );
-};
-
-const HomeWithPadding = () => {
-    return (
-        <div className="content">
-            <Home />
-        </div>
     );
 };
 
@@ -56,6 +57,13 @@ const AuthWithPadding = () => {
     return (
         <div className="content">
             <Authentication />
+        </div>
+    );
+};
+const AddPersonTofilmWithPadding = () => {
+    return (
+        <div className="content">
+            <AddPersonToFilmForm />
         </div>
     );
 };

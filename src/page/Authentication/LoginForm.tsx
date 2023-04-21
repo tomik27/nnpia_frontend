@@ -18,7 +18,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
                                              }) => {
     return (
         <form onSubmit={handleLogin}>
-            <Paper elevation={10}>
                 <Grid container direction="column" alignItems="center" spacing={3}>
                     <Grid item>
                         <Typography variant="h4">Login</Typography>
@@ -63,7 +62,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
                         </Typography>
                     </Grid>
                 </Grid>
-            </Paper>
         </form>
     );
 };

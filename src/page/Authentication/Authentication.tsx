@@ -8,11 +8,11 @@ import {login} from "../../features/login/loginSlice";
 const Authentication: React.FC = () => {
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
+    const [repeatPassword, setRepeatPassword] = useState("");
     const [password, setPassword] = useState("");
     const [error,setError] = useState<string|undefined>();
 
     const [showRegisterForm, setShowRegisterForm] = useState(false);
-   // const [isLoggedIn, setIsLoggedIn] = useState(false);
     const isLoggedIn = useAppSelector((state:RootState) => state.login.value)
     const dispatch = useAppDispatch();
 
@@ -22,12 +22,35 @@ const Authentication: React.FC = () => {
         console.log(`State changed in Authentication: ${isLoggedIn}`);
     }, [isLoggedIn])
 
-    const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        // zde by mohlo být volání API pro registraci uživatele
-        console.log(
-            `Registrace uživatele s emailem ${email} a uživatelským jménem ${username} byla úspěšná.`
-        );
+        if (password !== repeatPassword) {
+            setError("Heslo se neshoduje s opakovaným heslem.");
+            return;
+        }
+        try {
+            const response = await fetch(`${backendUrl}/user/signup`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ username, password,repeatPassword, email }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log(
+                    `Registrace uživatele s emailem ${data.email} a uživatelským jménem ${data.username} byla úspěšná.`
+                );
+                // Přihlásit uživatele po úspěšné registraci
+                handleLogin(event);
+            } else {
+                setError(await response.json());
+                console.error("Chyba při registraci:", response.status);
+            }
+        } catch (error) {
+            console.error("Při registraci došlo k chybě:", error);
+        }
     };
 
     const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -71,6 +94,8 @@ const Authentication: React.FC = () => {
             setUsername(value);
         } else if (name === "password") {
             setPassword(value);
+        }else if (name === "repeatPassword") {
+            setRepeatPassword(value);
         }
     };
 
@@ -80,7 +105,7 @@ const Authentication: React.FC = () => {
 
     return (
         <>
-            {error && <div>{error}</div>}
+            {error && <div>{JSON.stringify("Špatné přihlašovací údaje.")}</div>}
 
             {isLoggedIn ? (
                 <div>Přihlášení proběhlo úspěšně.</div>
@@ -91,6 +116,7 @@ const Authentication: React.FC = () => {
                     email={email}
                     username={username}
                     password={password}
+                    repeatPassword={repeatPassword}
                 />
             ) : (
                 <LoginForm
