@@ -5,6 +5,7 @@ import { Home, AccountCircle, Movie, Person, Login, MoreVert } from '@mui/icons-
 import {useAppSelector} from "../../app/hooks";
 import {RootState} from "../../app/store";
 import { Link } from 'react-router-dom';
+import FilmGrid from "../Film/FilmGrid";
 
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
@@ -50,6 +51,9 @@ const NavigationBar: React.FC<Props> = ({ onLogout }) => {
                         Osoby
                     </StyledButton>
                     <StyledButton color="inherit" startIcon={<Movie />} href="/films">
+                       Nejlepší filmy
+                    </StyledButton>
+                    <StyledButton color="inherit" startIcon={<Movie />} href="/filmGrid">
                         Filmy
                     </StyledButton>
                     <StyledButton
@@ -84,6 +88,11 @@ const NavigationBar: React.FC<Props> = ({ onLogout }) => {
                         <Link to="/userForm" onClick={handleAdminMenuClose} style={{ textDecoration: 'none', display: 'block' }}>
                             <MenuItem>
                                 Přidat uživatele
+                            </MenuItem>
+                        </Link>
+                        <Link to="/users" onClick={handleAdminMenuClose} style={{ textDecoration: 'none', display: 'block' }}>
+                            <MenuItem>
+                                Uživatelé
                             </MenuItem>
                         </Link>
                         <Link to="/addPersonToFilmForm" onClick={handleAdminMenuClose} style={{ textDecoration: 'none', display: 'block' }}>

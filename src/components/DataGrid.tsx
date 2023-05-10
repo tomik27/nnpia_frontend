@@ -1,7 +1,18 @@
 import React, { useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableRow, TableFooter, TablePagination } from '@mui/material';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    TableFooter,
+    TablePagination,
+    IconButton,
+} from "@mui/material";
 import { visuallyHidden } from '@mui/utils';
 import TableSortLabel from '@mui/material/TableSortLabel';
+import { Edit, Delete } from "@mui/icons-material";
+
 
 export interface Column {
     id: string;
@@ -11,13 +22,20 @@ export interface Column {
 interface DataGridProps {
     columns: Column[];
     data: any[];
+    onRowClick: (event: React.MouseEvent<unknown, MouseEvent>, rowData: any) => void;
+    onEditClick?: (rowData: any) => void;
+    onDeleteClick?: (rowData: any) => void;
     rowsPerPageOptions?: number[];
-    onRowClick?: (event: React.MouseEvent<unknown>, rowData: any) => void;
 }
 
 type Order = 'asc' | 'desc';
 
-const DataGrid: React.FC<DataGridProps> = ({ columns, data, rowsPerPageOptions = [5, 10, 25],onRowClick}) => {
+const DataGrid: React.FC<DataGridProps> = ({   columns,
+                                               data,
+                                               onRowClick,
+                                               onEditClick,
+                                               onDeleteClick,
+                                               rowsPerPageOptions = [5, 10, 25],}) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0]);
     const [order, setOrder] = useState<Order>('asc');
@@ -36,6 +54,26 @@ const DataGrid: React.FC<DataGridProps> = ({ columns, data, rowsPerPageOptions =
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(parseInt(event.target.value));
         setPage(0);
+    };
+
+    const handleEditClick = (
+        event: React.MouseEvent<HTMLButtonElement>,
+        rowData: any
+    ) => {
+        event.stopPropagation();
+        if (onEditClick) {
+            onEditClick(rowData);
+        }
+    };
+
+    const handleDeleteClick = (
+        event: React.MouseEvent<HTMLButtonElement>,
+        rowData: any
+    ) => {
+        event.stopPropagation();
+        if (onDeleteClick) {
+            onDeleteClick(rowData);
+        }
     };
 
     const descendingComparator = (a: any, b: any, orderBy: string) => {
@@ -90,10 +128,37 @@ const DataGrid: React.FC<DataGridProps> = ({ columns, data, rowsPerPageOptions =
                 {stableSort(data, getComparator(order, orderBy))
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row, index) => (
-                        <TableRow key={index} onClick={event => onRowClick && onRowClick(event, row)}>
-                        {columns.map(column => (
+                        <TableRow
+                            key={index}
+                            onClick={(event) => onRowClick && onRowClick(event, row)}
+                        >
+                            {columns.map((column) => (
                                 <TableCell key={column.id}>{row[column.id]}</TableCell>
                             ))}
+                            <TableCell>
+                                {onEditClick && (
+                                    <IconButton
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            onEditClick(row);
+                                        }}
+                                        size="small"
+                                    >
+                                        <Edit />
+                                    </IconButton>
+                                )}
+                                {onDeleteClick && (
+                                    <IconButton
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            onDeleteClick(row);
+                                        }}
+                                        size="small"
+                                    >
+                                        <Delete />
+                                    </IconButton>
+                                )}
+                            </TableCell>
                         </TableRow>
                     ))}
             </TableBody>

@@ -3,7 +3,16 @@ import { Typography, Button } from '@mui/material';
 import { Icon } from '@mui/material';
 
 import { Movie } from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
+import { styled, keyframes } from '@mui/material/styles';
+
+const fadeIn = keyframes`
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+`;
 
 const Root = styled('div')({
     display: 'flex',
@@ -11,8 +20,11 @@ const Root = styled('div')({
     justifyContent: 'center',
     alignItems: 'center',
     height: '100vh',
-    backgroundColor: '#fff',
-    color: '#000',
+    backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("https://source.unsplash.com/random?movie")',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    color: '#fff',
+    animation: `${fadeIn} 2s ease`,
 });
 
 const Title = styled(Typography)({
@@ -26,7 +38,6 @@ const Title = styled(Typography)({
 const IconStyled = styled(Icon)({
     fontSize: 100,
     marginRight: 16,
-
 });
 
 const Subtitle = styled(Typography)({
@@ -39,6 +50,10 @@ const ButtonStyled = styled(Button)({
     fontSize: 16,
     fontWeight: 'bold',
     padding: '16px 24px',
+    backgroundColor: '#e91e63',
+    '&:hover': {
+        backgroundColor: '#d81b60',
+    },
 });
 
 const HomePage = () => {

@@ -1,11 +1,31 @@
 import React, { useState } from "react";
-import { Button, TextField, Grid, Paper, Typography } from '@mui/material';
+import { Button, TextField, Grid, Paper, Typography, Chip } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { Movie } from '@mui/icons-material';
 
 interface UserProfileProps {
     username: string;
     email: string;
     favoriteFilms: string[];
 }
+
+const PaperStyled = styled(Paper)({
+    padding: 24,
+    maxWidth: 600,
+    margin: '24px auto',
+});
+
+const ButtonStyled = styled(Button)(({ theme }) => ({
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    '&:hover': {
+        backgroundColor: theme.palette.primary.dark,
+    },
+}));
+
+const ChipStyled = styled(Chip)(({ theme }) => ({
+    margin: theme.spacing(0.5),
+}));
 
 const UserProfile: React.FC<UserProfileProps> = ({ username, email, favoriteFilms }) => {
     const [editing, setEditing] = useState(false);
@@ -18,7 +38,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ username, email, favoriteFilm
     };
 
     return (
-        <Paper elevation={10}>
+        <PaperStyled elevation={10}>
             <Grid container direction="column" alignItems="center" spacing={3}>
                 <Grid item>
                     <Typography variant="h4">User Profile</Typography>
@@ -45,15 +65,15 @@ const UserProfile: React.FC<UserProfileProps> = ({ username, email, favoriteFilm
                 </Grid>
                 {editing ? (
                     <Grid item>
-                        <Button color="primary" variant="contained" onClick={handleSaveChanges}>
+                        <ButtonStyled variant="contained" onClick={handleSaveChanges}>
                             Save Changes
-                        </Button>
+                        </ButtonStyled>
                     </Grid>
                 ) : (
                     <Grid item>
-                        <Button color="primary" variant="contained" onClick={() => setEditing(true)}>
+                        <ButtonStyled variant="contained" onClick={() => setEditing(true)}>
                             Edit Profile
-                        </Button>
+                        </ButtonStyled>
                     </Grid>
                 )}
                 <Grid item>
@@ -61,11 +81,15 @@ const UserProfile: React.FC<UserProfileProps> = ({ username, email, favoriteFilm
                 </Grid>
                 <Grid item>
                     {favoriteFilms.map((film) => (
-                        <Typography key={film}>{film}</Typography>
+                        <ChipStyled
+                            key={film}
+                            label={film}
+                            icon={<Movie />}
+                        />
                     ))}
                 </Grid>
             </Grid>
-        </Paper>
+        </PaperStyled>
     );
 };
 

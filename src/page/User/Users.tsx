@@ -22,73 +22,76 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     marginBottom: theme.spacing(2),
 }));
 
-interface PersonData {
+interface UserData {
     id: number;
-    firstName: string;
-    lastName: string;
-    birthDate: string;
-    birthPlace: string;
+    username: string;
+    password: string;
+    email: string;
+    role: string;
 }
 
 const columns: Column[] = [
-    { id: 'firstName', label: 'First Name' },
-    { id: 'lastName', label: 'Last Name' },
-    { id: 'birthDate', label: 'Birth Date' },
-    { id: 'birthPlace', label: 'Birth Place' },
+    { id: 'username', label: 'Username' },
+    { id: 'password', label: 'Password' },
+    { id: 'email', label: 'Email' },
+    { id: 'role', label: 'Role' },
 ];
 
-const Persons: React.FC = () => {
+const Users: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
-    const [persons, setPersons] = useState<PersonData[]>([]);
+    const [users, setUsers] = useState<UserData[]>([]);
     const isLoggedIn = useAppSelector((state: RootState) => state.login.value);
     const user = useAppSelector((state: RootState) => state.login.user);
+    const token = useAppSelector((state: RootState) => state.login.token);
+
     const navigate = useNavigate();
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    const [editPerson, setEditPerson] = useState<PersonData | null>(null);
+    const [editUser, setEditUser] = useState<UserData | null>(null);
     const [openEditModal, setOpenEditModal] = useState(false);
-    //donutit komponentu k opětovnému vykreslení v Reactu
-    //funkce redukce (x => x + 1), která jednoduše zvýší svůj argument o 1. Počáteční stav je 0.
     const [, forceUpdate] = useReducer(x => x + 1, 0);
 
-
-
     useEffect(() => {
-        fetchPersons();
+        fetchUsers();
     }, []);
 
-    const fetchPersons = () => {
-        return fetch(`${backendUrl}/person`)
+    const fetchUsers = () => {
+        return fetch(`${backendUrl}/user`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
             .then((response) => response.json())
-            .then((data) => setPersons(data));
+            .then((data) => setUsers(data));
     };
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
     };
 
-    const filteredPersons = persons.filter((person) => {
-        const fullName = `${person.firstName} ${person.lastName}`;
-        return fullName.toLowerCase().includes(searchTerm.toLowerCase());
+    const filteredUsers = users.filter((user) => {
+        return user.username && user.username.toLowerCase().includes(searchTerm.toLowerCase());
     });
 
     const handleRowClick = (event: React.MouseEvent<unknown, MouseEvent>, rowData: any) => {
         console.log(`Row with id ${rowData.id} clicked`);
-        navigate(`/person/${rowData.id}`);
+        navigate(`/user/${rowData.id}`);
     };
 
-    const handleEditClick = async (rowData: PersonData) => {
-        console.log(`Edit person with id ${rowData.id}`);
-        setEditPerson(rowData); // Add this line to set the editPerson state
+    const handleEditClick = async (rowData: UserData) => {
+        console.log(`Edit user with id ${rowData.id}`);
+        setEditUser(rowData);
         setOpenEditModal(true);
     };
 
-    const updatePersonData = async (person: PersonData) => {
-        const response = await fetch(`${backendUrl}/person/${person.id}`, {
+    const updateUserData = async (user: UserData) => {
+        const response = await fetch(`${backendUrl}/user/${user.id}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+
             },
-            body: JSON.stringify(person)
+            body: JSON.stringify(user)
         });
 
         if (!response.ok) {
@@ -103,45 +106,44 @@ const Persons: React.FC = () => {
     };
 
     const handleEditSave = () => {
-        // When the modal is closed (user has finished editing), send the updated data to the server.
-        if (editPerson !== null) {
-            updatePersonData(editPerson)
+        if (editUser !== null) {
+            updateUserData(editUser)
                 .then(() => {
-                    console.log('Person updated:', editPerson);
-                    fetchPersons().then(() => forceUpdate()); // Force a re-render after fetching the updated data
+                    console.log('User updated:', editUser);
+                    fetchUsers().then(() => forceUpdate());
                 })
                 .catch((err) => {
-                    console.error('Error updating person:', err);
+                    console.error('Error updating user:', err);
                 });
-
         } else {
-            console.error('Edit person is null. Cannot update.');
+            console.error('Edit user is null. Cannot update.');
         }
         setOpenEditModal(false);
     };
 
     const handleEditInputChange = (
         event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-        field: keyof PersonData
+        field: keyof UserData
     ) => {
-        if (editPerson) {
-            setEditPerson({ ...editPerson, [field]: event.target.value });
+        if (editUser) {
+            setEditUser({ ...editUser, [field]: event.target.value });
         }
     };
 
 
-    const handleDeleteClick = (rowData: PersonData) => {
-        console.log(`Delete person with id ${rowData.id}`);
-        // Add your delete logic here
-        fetch(`${backendUrl}/person/${rowData.id}`, {
+    const handleDeleteClick = (rowData: UserData) => {
+        console.log(`Delete user with id ${rowData.id}`);
+        fetch(`${backendUrl}/user/${rowData.id}`, {
             method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         })
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-                // Refresh the data after delete
-                fetchPersons()
+                fetchUsers();
             })
             .catch(error => console.error('There has been a problem with your fetch operation: ', error));
 
@@ -161,7 +163,7 @@ const Persons: React.FC = () => {
                 <StyledTableContainer>
                     <DataGrid
                         columns={columns}
-                        data={filteredPersons}
+                        data={filteredUsers}
                         onRowClick={handleRowClick}
                         onEditClick={isAdmin ? handleEditClick : undefined}
                         onDeleteClick={isAdmin ? handleDeleteClick : undefined}
@@ -169,35 +171,35 @@ const Persons: React.FC = () => {
                 </StyledTableContainer>
             </Paper>
 
-            {editPerson && (
+            {editUser && (
                 <Dialog open={openEditModal} onClose={handleEditClose}>
-                    <DialogTitle>Edit Person</DialogTitle>
+                    <DialogTitle>Edit User</DialogTitle>
                     <DialogContent>
                         <TextField
-                            label="First Name"
-                            value={editPerson.firstName}
-                            onChange={(event) => handleEditInputChange(event, 'firstName')}
+                            label="Username"
+                            value={editUser.username}
+                            onChange={(event) => handleEditInputChange(event, 'username')}
                             fullWidth
                             margin="normal"
                         />
                         <TextField
-                            label="Last Name"
-                            value={editPerson.lastName}
-                            onChange={(event) => handleEditInputChange(event, 'lastName')}
+                            label="Password"
+                            value={editUser.password}
+                            onChange={(event) => handleEditInputChange(event, 'password')}
                             fullWidth
                             margin="normal"
                         />
                         <TextField
-                            label="Birth Date"
-                            value={editPerson.birthDate}
-                            onChange={(event) => handleEditInputChange(event, 'birthDate')}
+                            label="Email"
+                            value={editUser.email}
+                            onChange={(event) => handleEditInputChange(event, 'email')}
                             fullWidth
                             margin="normal"
                         />
                         <TextField
-                            label="Birth Place"
-                            value={editPerson.birthPlace}
-                            onChange={(event) => handleEditInputChange(event, 'birthPlace')}
+                            label="Role"
+                            value={editUser.role}
+                            onChange={(event) => handleEditInputChange(event, 'role')}
                             fullWidth
                             margin="normal"
                         />
@@ -212,6 +214,10 @@ const Persons: React.FC = () => {
             )}
         </div>
     );
+
 };
 
-export default Persons;
+export default Users;
+
+
+
