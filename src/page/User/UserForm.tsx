@@ -45,6 +45,7 @@ const UserForm = () => {
             setError(json);
         } catch (error: any) {
             console.error(error);
+            alert("User successfully added!");
             setError(error.value);
         }
         setSubmitting(false);
@@ -110,7 +111,6 @@ const UserForm = () => {
                         >
                         Odeslat
                     </Button>
-                    {error && <div>{JSON.stringify(error)}</div>}
                 </Grid>
             </Grid>
         </form>

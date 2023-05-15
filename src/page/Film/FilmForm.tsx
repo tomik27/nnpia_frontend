@@ -47,6 +47,8 @@ const FilmForm = () => {
             }
             const json = await response.json();
             console.log(json);
+            alert("Film successfully added!");
+
             setError(json);
         } catch (error: any) {
             console.error(error);

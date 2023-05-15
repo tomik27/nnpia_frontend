@@ -1,57 +1,64 @@
 import { useEffect, useState } from "react";
-import {FilmProps} from "../../components/types";
 import Film from "../../components/Film";
+import { base64ToArrayBuffer, byteArrayToBase64 } from './../HelpfulFunction/byteToImage';
+
+interface FilmProps {
+    id: number;
+    name: string;
+    path_to_image: string | null;
+    genre: string;
+    releaseYear: number;
+    image: string | null;
+    ratingByUsers: UserHasFilm[];
+}
+
+interface UserHasFilm {
+    userId: number;
+    rating: number;
+    comment: string;
+}
+
+// This is the new interface that includes averageRating
+interface FilmWithRating extends FilmProps {
+    averageRating: number;
+}
+
 const Films: React.FC = () => {
-    const [films, setFilms] = useState<FilmProps[]>([]);
+    const [films, setFilms] = useState<FilmWithRating[]>([]);
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     useEffect(() => {
-        setFilms([
-            {
-                id: 1,
-                name: "The Godfather",
-                path_to_image: "https://picsum.photos/id/1/200/300",
-                genre: "Crime, Drama",
-                releaseYear: 1972,
-                index:1
-            },
-            {
-                id: 2,
-                name: "The Shawshank Redemption",
-                path_to_image: "https://picsum.photos/id/2/200/300",
-                genre: "Drama",
-                releaseYear: 1994,
-                index:1
-            },
-            {
-                id: 3,
-                name: "The Dark Knight",
-                path_to_image: "https://picsum.photos/id/3/200/300",
-                genre: "Action, Crime, Drama",
-                releaseYear: 2008,
-                index:1
-            },
-            {
-                id: 4,
-                name: "Pulp Fiction",
-                path_to_image: "https://picsum.photos/id/4/200/300",
-                genre: "Crime, Drama",
-                releaseYear: 1994,
-                index:1
-            },
-            {
-                id: 5,
-                name: "The Lord of the Rings: The Fellowship of the Ring",
-                path_to_image: "https://picsum.photos/id/5/200/300",
-                genre: "Action, Adventure, Drama",
-                releaseYear: 2001,
-                index:1
-            }
-        ]);
+        fetch(`${backendUrl}/film`)
+            .then(response => response.json())
+            .then((data: FilmProps[]) => {
+                const filmsWithRatings = data.map(film => {
+                    let buffer = base64ToArrayBuffer(film.image!);
+                    let bytes = new Uint8Array(buffer);
+                    let base64Image = byteArrayToBase64(bytes);
+                    film.image = `data:image/jpeg;base64,${base64Image}`;
+
+                    let averageRating = 0;
+                    if (film.ratingByUsers && film.ratingByUsers.length > 0) {
+                        const totalRating = film.ratingByUsers.reduce((total, userHasFilm) => total + userHasFilm.rating, 0);
+                        averageRating = totalRating / film.ratingByUsers.length;
+                    }
+
+                    // Return a new object that includes averageRating
+                    return {
+                        ...film,
+                        averageRating,
+                    } as FilmWithRating;
+                });
+
+                filmsWithRatings.sort((filmA, filmB) => filmB.averageRating - filmA.averageRating);
+
+                setFilms(filmsWithRatings);
+            });
     }, []);
 
     return (
         <div className="films-container">
-        {films.map((film, index) => (
+            {films.map((film, index) => (
                 <Film key={film.id} index={index + 1} {...film} />
             ))}
         </div>

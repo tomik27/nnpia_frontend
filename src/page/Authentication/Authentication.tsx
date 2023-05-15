@@ -44,6 +44,7 @@ const Authentication: React.FC = () => {
                 );
                 // Přihlásit uživatele po úspěšné registraci
                 handleLogin(event);
+                alert("Registrace proběhla úspěšně!");
             } else {
                 setError(await response.json());
                 console.error("Chyba při registraci:", response.status);
@@ -73,8 +74,11 @@ const Authentication: React.FC = () => {
                         username: data.username,
                         role: data.role,
                         email: data.email,
+                        id: data.id
                     },
                 }));
+                alert("Přihlášení proběhlo úspěšně!");
+
             } else {
                 setError(await response.json());
                 console.error('Chyba při přihlašování:', response.status);

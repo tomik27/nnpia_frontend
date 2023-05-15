@@ -4,6 +4,7 @@ interface User {
     username: string;
     role: string;
     email: string;
+    id:number;
 }
 
 interface LoginState {

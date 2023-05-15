@@ -1,7 +1,4 @@
 import React from 'react';
-import Films from "./page/Film/Films";
-import HomePage from "./page/Home/HomePage";
-import NavigationBar from "./page/Home/NavigationBar";
 import RoutesComponent from "./page/Home/Routes";
 
 function App() {

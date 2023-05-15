@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Autocomplete, Box, Button, CircularProgress, TextField } from "@mui/material";
+import { Autocomplete, Box, Button, CircularProgress, TextField,MenuItem } from "@mui/material";
+import {useAppSelector} from "../../app/hooks";
+import {RootState} from "../../app/store";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -16,8 +18,8 @@ interface Film {
 
 interface FilmHasPerson {
     typeOfPerson: string;
-    film: Film;
-    person: Person;
+    filmId: number;
+    personId: number;
 }
 
 interface FormValues {
@@ -30,6 +32,7 @@ const AddPersonToFilmForm = () => {
     const [loading, setLoading] = useState(false);
     const [persons, setPersons] = useState<Person[]>([]);
     const [films, setFilms] = useState<Film[]>([]);
+    const token = useAppSelector((state: RootState) => state.login.token);
     const [formValues, setFormValues] = useState<FormValues>({
         typeOfPerson: "ACTOR",
         film: null,
@@ -63,23 +66,28 @@ const AddPersonToFilmForm = () => {
         const { typeOfPerson, film, person } = formValues;
         const filmHasPerson: FilmHasPerson = {
             typeOfPerson,
-            film: film!,
-            person: person!,
+            filmId: film?.id!,
+            personId: person?.id!,
         };
-        fetch(`${backendUrl}/filmhasperson`, {
+        fetch(`${backendUrl}/film/addPerson`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(filmHasPerson),
         })
-            .then(() => {
-                alert("Person added to film!");
-                setFormValues({
-                    typeOfPerson: "ACTOR",
-                    film: null,
-                    person: null,
-                });
+            .then((response) => {
+                if (response.ok) {
+                    alert("Person added to film!");
+                    setFormValues({
+                        typeOfPerson: "ACTOR",
+                        film: null,
+                        person: null,
+                    });
+                } else {
+                    throw new Error("Failed to add person to film.");
+                }
             })
             .catch((error) => {
                 console.error(error);
@@ -141,9 +149,9 @@ const AddPersonToFilmForm = () => {
                     variant="outlined"
                     style={{ marginTop: "1rem" }}
                     >
-                    <option value="ACTOR">Actor</option>
-                    <option value="DIRECTOR">Director</option>
-                    <option value="WRITER">Writer</option>
+                    <MenuItem value="ACTOR">Actor</MenuItem>
+                    <MenuItem value="DIRECTOR">Director</MenuItem>
+                    <MenuItem value="WRITER">Writer</MenuItem>
                     </TextField>
                     <Button type="submit" variant="contained" disabled={loading} style={{ marginTop: "1rem" }}>
                 {loading ? <CircularProgress size={24} /> : "Add person to film"}

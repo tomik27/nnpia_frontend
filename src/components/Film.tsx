@@ -1,6 +1,16 @@
 import { Card, CardContent, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { FilmProps } from "./types";
+
+interface FilmProps {
+    id: number;
+    name: string;
+    path_to_image: string | null;
+    genre: string;
+    releaseYear: number;
+    image: string | null;
+    averageRating: number;
+    index: number;
+}
 
 const StyledCard = styled(Card)({
     display: "flex",
@@ -28,23 +38,25 @@ const Order = styled("div")({
 });
 
 const Film: React.FC<FilmProps> = ({
-                                              id,
-                                              name,
-                                              path_to_image,
-                                              genre,
-                                              releaseYear,
-                                          }) => {
+                                       index,
+                                       name,
+                                       image,
+                                       genre,
+                                       releaseYear,
+                                       averageRating,
+                                   }) => {
     return (
         <StyledCard>
-            <Order>#{id}</Order>
-            <StyledImg src={path_to_image} alt={name} />
+            <Order>#{index}</Order>
+            <StyledImg src={image} alt={name} />
             <StyledCardContent>
-                <CardContent>
-                    <Typography variant="h5">{name}</Typography>
-                    <Typography variant="subtitle1" color="textSecondary">
-                        {genre} | {releaseYear}
-                    </Typography>
-                </CardContent>
+                <Typography variant="h5">{name}</Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                    {genre} | {releaseYear}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                    Average rating: {averageRating.toFixed(2)}
+                </Typography>
             </StyledCardContent>
         </StyledCard>
     );

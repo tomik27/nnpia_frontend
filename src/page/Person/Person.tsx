@@ -7,12 +7,23 @@ import {
     CardHeader,
     Container,
     Divider,
+    Grid,
     List,
     ListItem,
+    ListItemIcon,
     ListItemText,
-    Typography
+    Typography,
 } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import MovieIcon from '@mui/icons-material/Movie';
+
+
+interface FilmDetail {
+    typeOfPerson: string;
+    filmId: number;
+    personId: number;
+    filmName: string;
+}
 
 interface PersonProps {
     id: number;
@@ -20,7 +31,7 @@ interface PersonProps {
     lastName: string;
     birthDate: string;
     birthPlace: string;
-    ArrayOfFilm: string[];
+    personHasFilmDtos: FilmDetail[];
 }
 
 const theme = createTheme({
@@ -51,28 +62,35 @@ const Person = () => {
     return (
         <ThemeProvider theme={theme}>
             <Container maxWidth="sm">
-                <Box sx={{ my: 4 }}>
-                    <Card>
-                        <CardHeader title={`${person.firstName} ${person.lastName}`} />
-                        <CardContent>
-                            <Typography>Date of Birth: {person.birthDate}</Typography>
-                            <Typography>Place of Birth: {person.birthPlace}</Typography>
-                        </CardContent>
-                    </Card>
-                </Box>
-                <Box sx={{ my: 4 }}>
-                    <Card>
-                        <CardHeader title="Films" />
-                        <Divider />
-                        <List>
-                            {person.ArrayOfFilm && person.ArrayOfFilm.map(film => (
-                                <ListItem key={film}>
-                                    <ListItemText primary={film} />
-                                </ListItem>
-                            ))}
-                        </List>
-                    </Card>
-                </Box>
+                <Grid container spacing={4}>
+                    <Grid item xs={12}>
+                        <Card>
+                            <CardHeader title={`${person.firstName} ${person.lastName}`} />
+                            <CardContent>
+                                <Typography variant="body1">Date of Birth:</Typography>
+                                <Typography variant="body2" color="textSecondary">{person.birthDate}</Typography>
+                                <Typography variant="body1">Place of Birth:</Typography>
+                                <Typography variant="body2" color="textSecondary">{person.birthPlace}</Typography>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Card>
+                            <CardHeader title="Films" />
+                            <Divider />
+                            <List>
+                                {person.personHasFilmDtos && person.personHasFilmDtos.map((filmDetail, index) => (
+                                    <ListItem key={index}>
+                                        <ListItemIcon>
+                                            <MovieIcon />
+                                        </ListItemIcon>
+                                        <ListItemText primary={filmDetail.filmName} secondary={filmDetail.typeOfPerson} />
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Card>
+                    </Grid>
+                </Grid>
             </Container>
         </ThemeProvider>
     );

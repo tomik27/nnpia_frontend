@@ -2,7 +2,6 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import NavigationBar from './NavigationBar';
 import Home from './HomePage';
 import Films from '../Film/Films';
-import UserAccount from "../User/UserProfile";
 import Persons from "../Person/Persons";
 import './Routes.css';
 import LoginForm from "../Authentication/LoginForm";
@@ -19,6 +18,7 @@ import AddPersonToFilmForm from "../Film/AddPersonToFilmForm";
 import PaddedContent from "./PaddedContent";
 import Users from "../User/Users";
 import FilmGrid from "../Film/FilmGrid";
+import Film from "../Film/Film";
 
 interface Props {
     onLogout: () => void;
@@ -51,7 +51,7 @@ const RoutesComponent: React.FC<Props> = ({ onLogout }) => {
                 <Route path='/addPersonToFilmForm' element={<PaddedContent><AddPersonToFilmForm /></PaddedContent>} />
                 <Route path="/users" element={<PaddedContent><Users /></PaddedContent>} />
                 <Route path="/filmGrid" element={<PaddedContent><FilmGrid /></PaddedContent>} />
-
+                <Route path="/film/:id" element={<PaddedContent><Film /></PaddedContent>} />
 
             </Routes>
         </BrowserRouter>

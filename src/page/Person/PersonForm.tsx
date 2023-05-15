@@ -37,18 +37,18 @@ const PersonForm = () => {
                 body: JSON.stringify(data),
             });
             if (!response.ok) {
-                // throw new Error(`HTTP error! status: ${response.status}`);
-                setError(`HTTP error! status: ${response.statusText}`);
+                const json = await response.json();
+                throw new Error(json.message || `HTTP error! status: ${response.statusText}`);
             }
-            const json = await response.json();
-            console.log(json);
-            setError(json);
+            alert("Person successfully added!");
+            setError(undefined);
         } catch (error: any) {
             console.error(error);
-            setError(error.value);
+            setError(error.message);
         }
         setSubmitting(false);
     };
+
 
     return (
         <div>

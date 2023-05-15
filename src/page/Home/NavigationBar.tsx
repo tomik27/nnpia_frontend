@@ -5,8 +5,6 @@ import { Home, AccountCircle, Movie, Person, Login, MoreVert } from '@mui/icons-
 import {useAppSelector} from "../../app/hooks";
 import {RootState} from "../../app/store";
 import { Link } from 'react-router-dom';
-import FilmGrid from "../Film/FilmGrid";
-
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
     zIndex: theme.zIndex.drawer + 1,

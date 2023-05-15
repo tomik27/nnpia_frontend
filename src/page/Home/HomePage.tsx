@@ -1,7 +1,6 @@
 import React from 'react';
 import { Typography, Button } from '@mui/material';
 import { Icon } from '@mui/material';
-
 import { Movie } from '@mui/icons-material';
 import { styled, keyframes } from '@mui/material/styles';
 

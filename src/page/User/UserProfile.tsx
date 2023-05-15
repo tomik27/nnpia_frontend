@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { Button, TextField, Grid, Paper, Typography, Chip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Movie } from '@mui/icons-material';
+import {useAppSelector} from "../../app/hooks";
+import {RootState} from "../../app/store";
 
 interface UserProfileProps {
     username: string;
@@ -27,14 +29,60 @@ const ChipStyled = styled(Chip)(({ theme }) => ({
     margin: theme.spacing(0.5),
 }));
 
-const UserProfile: React.FC<UserProfileProps> = ({ username, email, favoriteFilms }) => {
+const UserProfile: React.FC<UserProfileProps> = () => {
     const [editing, setEditing] = useState(false);
-    const [newUsername, setNewUsername] = useState(username);
-    const [newEmail, setNewEmail] = useState(email);
+    const [newUsername, setNewUsername] = useState('');
+    const [newEmail, setNewEmail] = useState('');
+    const [favoriteFilms, setFavoriteFilms] = useState<string[]>([]);
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const user = useAppSelector((state: RootState) => state.login.user);
+
+    useEffect(() => {
+        fetch(`${backendUrl}/user/${user?.id}`)
+            .then(response => response.json())
+            .then(data => {
+                setNewUsername(data.username);
+                setNewEmail(data.email);
+                setFavoriteFilms(data.userRatingFilms.map((film: any) => film.filmName));
+            })
+            .catch(error => console.error('Error:', error));
+    }, [backendUrl, user]);
 
     const handleSaveChanges = () => {
-        // Handle saving changes to the user profile (e.g. make an API call)
-        setEditing(false);
+        // Define the body of the PUT request
+        const requestBody = {
+            username: newUsername,
+            email: newEmail,
+            // Include other fields as necessary
+        };
+
+        // Send the PUT request to the backend
+        fetch(`${backendUrl}/user/${user?.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                // Update the state with the new data
+                setNewUsername(data.username);
+                setNewEmail(data.email);
+                // Update other state variables as necessary
+
+                // Exit the editing mode
+                setEditing(false);
+            })
+            .catch((error) => {
+                // Handle the error
+                console.error('There has been a problem with your fetch operation:', error);
+            });
     };
 
     return (
