@@ -28,7 +28,6 @@ import { base64ToArrayBuffer, byteArrayToBase64 } from './../HelpfulFunction/byt
 interface FilmProps {
     id: number;
     name: string;
-    path_to_image: string | null;
     genre: string;
     releaseYear: number;
     image: string | null;
@@ -52,8 +51,6 @@ interface PersonInFilm {
     personLastname: string;
 }
 
-
-
 const theme = createTheme({
     typography: {
         h3: {
@@ -71,27 +68,17 @@ const Film = () => {
     const {id} = useParams<{ id: string }>();
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const token = useAppSelector((state: RootState) => state.login.token);
-    const [comments, setComments] = useState<Comment[]>([]);
     const user = useAppSelector((state: RootState) => state.login.user);
+    const isLoggedIn = useAppSelector((state: RootState) => state.login.value);
 
-
-    /* useEffect(() => {
-         fetch(`${backendUrl}/comments/${id}`, {
-             headers: {
-                 'Authorization': `Bearer ${token}`
-             }
-         })
-             .then(response => response.json())
-             .then(data => setComments(data));
-     }, [id]);*/
 
 
     useEffect(() => {
-        fetch(`${backendUrl}/film/${id}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        })
+        fetchFilmData();
+    }, [id]);
+
+    const fetchFilmData = () => {
+        fetch(`${backendUrl}/film/${id}`)
             .then(response => response.json())
             .then(data => {
                 let buffer = base64ToArrayBuffer(data.image);
@@ -100,7 +87,8 @@ const Film = () => {
                 data.image = `data:image/jpeg;base64,${base64Image}`;
                 setFilm(data);
             });
-    }, [id]);
+    }
+
 
     const handleRatingChange = (event: React.ChangeEvent<{}>, value: number | null) => {
         if (value !== null) {
@@ -114,7 +102,7 @@ const Film = () => {
 
     const handleSubmit = async () => {
         // Ensure user and film IDs are available
-        const userId =user?.id;
+        const userId = user?.id;
         const filmId = id; // Assuming that the film ID is stored in the film state
 
         // Create the payload
@@ -122,20 +110,19 @@ const Film = () => {
             rating, comment, userId, filmId
         };
 
-
-        // Make the POST request to the backend
         const response = await fetch(`${backendUrl}/user/addFilm`, {
             method: 'POST', headers: {
                 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`  // If needed
             }, body: JSON.stringify(payload)
         });
 
-        // Check the response
         if (response.ok) {
             // Reset the form or show a success message
             setRating(0);
             setComment('');
-            // You might want to re-fetch the film data here to show the updated ratings and comments
+
+            // Re-fetch the film data to show the updated ratings and comments
+            fetchFilmData();
         } else {
             // Handle the error
             console.error('Failed to submit the form');
@@ -252,6 +239,7 @@ const Film = () => {
                                 </Card>
                             </Box>
                         </Grid>
+                        {isLoggedIn ? (
                         <Grid item xs={12}>
                             <Box border={1} borderColor="#2596be">
                                 <Card>
@@ -283,7 +271,7 @@ const Film = () => {
                                     </CardContent>
                                 </Card>
                             </Box>
-                        </Grid>
+                        </Grid> ):''}
 
                     </Grid>
                 </Container>

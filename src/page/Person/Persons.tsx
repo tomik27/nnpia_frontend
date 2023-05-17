@@ -40,10 +40,10 @@ const columns: Column[] = [
 const Persons: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [persons, setPersons] = useState<PersonData[]>([]);
-    const isLoggedIn = useAppSelector((state: RootState) => state.login.value);
     const user = useAppSelector((state: RootState) => state.login.user);
     const navigate = useNavigate();
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const token = useAppSelector((state: RootState) => state.login.token);
     const [editPerson, setEditPerson] = useState<PersonData | null>(null);
     const [openEditModal, setOpenEditModal] = useState(false);
     //donutit komponentu k opětovnému vykreslení v Reactu
@@ -86,7 +86,8 @@ const Persons: React.FC = () => {
         const response = await fetch(`${backendUrl}/person/${person.id}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(person)
         });
@@ -135,6 +136,9 @@ const Persons: React.FC = () => {
         // Add your delete logic here
         fetch(`${backendUrl}/person/${rowData.id}`, {
             method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         })
             .then(response => {
                 if (!response.ok) {

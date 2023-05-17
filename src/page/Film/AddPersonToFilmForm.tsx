@@ -60,6 +60,40 @@ const AddPersonToFilmForm = () => {
         });
     };
 
+    const handleDelete = () => {
+        const { typeOfPerson, film, person } = formValues;
+        const filmHasPerson: FilmHasPerson = {
+            typeOfPerson,
+            filmId: film?.id!,
+            personId: person?.id!,
+        };
+        fetch(`${backendUrl}/film/deletePerson`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(filmHasPerson),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    alert("Person removed from film!");
+                    setFormValues({
+                        typeOfPerson: "ACTOR",
+                        film: null,
+                        person: null,
+                    });
+                } else {
+                    throw new Error("Failed to remove person from film.");
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+                alert("An error occurred while removing person from film.");
+            })
+            .finally(() => setLoading(false));
+    };
+
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setLoading(true);
@@ -153,9 +187,12 @@ const AddPersonToFilmForm = () => {
                     <MenuItem value="DIRECTOR">Director</MenuItem>
                     <MenuItem value="WRITER">Writer</MenuItem>
                     </TextField>
-                    <Button type="submit" variant="contained" disabled={loading} style={{ marginTop: "1rem" }}>
+            <Button type="submit" variant="contained" disabled={loading} style={{ marginTop: "1rem" }}>
                 {loading ? <CircularProgress size={24} /> : "Add person to film"}
-                    </Button>
+            </Button>
+            <Button variant="contained" color="secondary" onClick={handleDelete} style={{ marginTop: "1rem" }}>
+                Remove person from film
+            </Button>
                     </Box>
                     );
                 };

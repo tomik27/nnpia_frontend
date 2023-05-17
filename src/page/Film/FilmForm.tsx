@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import {TextField, Select, MenuItem, Button, Grid, FormHelperText, FormControl, InputLabel} from '@mui/material';
+import {useAppSelector} from "../../app/hooks";
+import {RootState} from "../../app/store";
 
 interface FormValues {
     name: string;
@@ -20,6 +22,7 @@ const schema = yup.object().shape({
 const FilmForm = () => {
     const [error,setError] = useState<string|undefined>();
     const [submitting, setSubmitting] = useState(false);
+    const token = useAppSelector((state: RootState) => state.login.token);
     const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
         resolver: yupResolver(schema),
     });
@@ -40,9 +43,12 @@ const FilmForm = () => {
             const response = await fetch(`${backendUrl}/film`, {
                 method: 'POST',
                 body: formData,
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
             });
             if (!response.ok) {
-               // throw new Error(`HTTP error! status: ${response.status}`);
+                // throw new Error(`HTTP error! status: ${response.status}`);
                 setError(`HTTP error! status: ${response.statusText}`);
             }
             const json = await response.json();
@@ -131,9 +137,9 @@ const FilmForm = () => {
                         >
                             Odeslat
                         </Button>
-                        {error && <div>{JSON.stringify(error)}</div>}
                     </Grid>
                 </Grid>
+                {error && <div>{JSON.stringify(error)}</div>}
             </form>
         </div>
     );

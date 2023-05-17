@@ -27,6 +27,8 @@ interface Props {
 const NavigationBar: React.FC<Props> = ({ onLogout }) => {
     const [adminMenuAnchorEl, setAdminMenuAnchorEl] = React.useState<null | HTMLElement>(null);
     const isLoggedIn = useAppSelector((state:RootState) => state.login.value)
+    const user = useAppSelector((state: RootState) => state.login.user);
+
 
 
     const handleAdminMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -36,6 +38,8 @@ const NavigationBar: React.FC<Props> = ({ onLogout }) => {
     const handleAdminMenuClose = () => {
         setAdminMenuAnchorEl(null);
     };
+
+    const isAdmin = user && user.role === 'ROLE_ADMIN';
 
     return (
         <StyledAppBar position="fixed">
@@ -54,13 +58,9 @@ const NavigationBar: React.FC<Props> = ({ onLogout }) => {
                     <StyledButton color="inherit" startIcon={<Movie />} href="/filmGrid">
                         Filmy
                     </StyledButton>
-                    <StyledButton
-                        color="inherit"
-                        startIcon={<AccountCircle />}
-                        href="/account"
-                    >
-                        Můj účet
-                    </StyledButton>
+
+                    {isAdmin && (
+                        <>
                     <StyledButton
                         color="inherit"
                         startIcon={<MoreVert />}
@@ -99,7 +99,17 @@ const NavigationBar: React.FC<Props> = ({ onLogout }) => {
                             </MenuItem>
                         </Link>
                     </Menu>
+                        </>
+                    )}
                     {isLoggedIn ? (
+                        <>
+                            <StyledButton
+                                color="inherit"
+                                startIcon={<AccountCircle />}
+                                href="/account"
+                            >
+                                Můj účet
+                            </StyledButton>
                         <StyledButton
                             color="inherit"
                             startIcon={<AccountCircle />}
@@ -107,6 +117,7 @@ const NavigationBar: React.FC<Props> = ({ onLogout }) => {
                         >
                             Logout
                         </StyledButton>
+                        </>
                     ) : (
                         <StyledButton
                             color="inherit"

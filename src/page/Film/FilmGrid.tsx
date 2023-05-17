@@ -25,6 +25,7 @@ interface MovieData {
     name: string;
     genre: string;
     releaseYear: number;
+    imageFile: FileList | null;
 }
 
 const columns: Column[] = [
@@ -79,131 +80,161 @@ const FilmGrid: React.FC = () => {
         setOpenEditModal(true);
     };
 
-    const updateMovieData = async (movie: MovieData) => {
-        const response = await fetch(`${backendUrl}/film/${movie.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-
-            },
-            body: JSON.stringify(movie)
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+    const updateMovieData = async (data: MovieData) => {
+        const formData = new FormData();
+        formData.append('id', data.id.toString());
+        formData.append('name', data.name);
+        formData.append('genre', data.genre);
+        if (data.releaseYear !== null) {
+            formData.append('releaseYear', data.releaseYear.toString());
         }
-
-        return await response.json();
+        if (data.imageFile) {
+            formData.append('imageFile', data.imageFile[0]);
+        }
+        try {
+            const response = await fetch(`${backendUrl}/film/${data.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.statusText}`);
+            }
+            const json = await response.json();
+            console.log(json);
+            alert("Film successfully updated!");
+        } catch (error: any) {
+            console.error(error);
+        }
     };
 
     const handleEditClose = () => {
         setOpenEditModal(false);
     };
 
-        const handleEditSave = () => {
-            if (editMovie !== null) {
-                updateMovieData(editMovie)
-                    .then(() => {
-                        console.log('Movie updated:', editMovie);
-                        fetchMovies().then(() => forceUpdate());
-                    })
-                    .catch((err) => {
-                        console.error('Error updating movie:', err);
-                    });
-            } else {
-                console.error('Edit movie is null. Cannot update.');
-            }
-            setOpenEditModal(false);
-        };
-
-        const handleEditInputChange = (
-            event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-            field: keyof MovieData
-        ) => {
-            if (editMovie) {
-                setEditMovie({ ...editMovie, [field]: event.target.value });
-            }
-        };
-
-        const handleDeleteClick = (rowData: MovieData) => {
-            console.log(`Delete movie with id ${rowData.id}`);
-            fetch(`${backendUrl}/film/${rowData.id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    fetchMovies();
+    const handleEditSave = () => {
+        if (editMovie !== null) {
+            updateMovieData(editMovie)
+                .then(() => {
+                    console.log('Movie updated:', editMovie);
+                    fetchMovies().then(() => forceUpdate());
                 })
-                .catch(error => console.error('There has been a problem with your fetch operation: ', error));
-        };
-
-        const isAdmin = user && user.role === 'ROLE_ADMIN';
-
-        return (
-            <div>
-                <StyledTextField
-                    label="Search"
-                    variant="outlined"
-                    fullWidth
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                />
-                <Paper>
-                    <StyledTableContainer>
-                        <DataGrid
-                            columns={columns}
-                            data={filteredMovies}
-                            onRowClick={handleRowClick}
-                            onEditClick={isAdmin ? handleEditClick : undefined}
-                            onDeleteClick={isAdmin ? handleDeleteClick : undefined}
-                        />
-                    </StyledTableContainer>
-                </Paper>
-
-                {editMovie && (
-                    <Dialog open={openEditModal} onClose={handleEditClose}>
-                        <DialogTitle>Edit Movie</DialogTitle>
-                        <DialogContent>
-                            <TextField
-                                label="Name"
-                                value={editMovie.name}
-                                onChange={(event) => handleEditInputChange(event, 'name')}
-                                fullWidth
-                                margin="normal"
-                            />
-                            <TextField
-                                label="Genre"
-                                value={editMovie.genre}
-                                onChange={(event) => handleEditInputChange(event, 'genre')}
-                                fullWidth
-                                margin="normal"
-                            />
-                            <TextField
-                                label="Release Year"
-                                value={editMovie.releaseYear}
-                                onChange={(event) => handleEditInputChange(event, 'releaseYear')}
-                                fullWidth
-                                margin="normal"
-                            />
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={handleEditClose}>Cancel</Button>
-                            <Button onClick={handleEditSave} variant="contained" color="primary">
-                                Save
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
-                )}
-            </div>
-        );
+                .catch((err) => {
+                    console.error('Error updating movie:', err);
+                });
+        } else {
+            console.error('Edit movie is null. Cannot update.');
+        }
+        setOpenEditModal(false);
     };
 
-    export default FilmGrid;
+    const handleEditInputChange = (
+        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+        field: keyof MovieData
+    ) => {
+        if (editMovie) {
+            if (field === 'imageFile' && event.target instanceof HTMLInputElement) {
+                // For file inputs, we want to save FileList object to state
+                setEditMovie({ ...editMovie, [field]: event.target.files });
+            } else {
+                // For other (text) inputs, we continue as before
+                setEditMovie({ ...editMovie, [field]: event.target.value });
+            }
+        }
+    };
 
 
+    const handleDeleteClick = (rowData: MovieData) => {
+        console.log(`Delete movie with id ${rowData.id}`);
+        fetch(`${backendUrl}/film/${rowData.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                fetchMovies();
+            })
+            .catch(error => console.error('There has been a problem with your fetch operation: ', error));
+    };
+
+    const isAdmin = user && user.role === 'ROLE_ADMIN';
+
+    return (
+        <div>
+            <StyledTextField
+                label="Search"
+                variant="outlined"
+                fullWidth
+                value={searchTerm}
+                onChange={handleSearchChange}
+            />
+            <Paper>
+                <StyledTableContainer>
+                    <DataGrid
+                        columns={columns}
+                        data={filteredMovies}
+                        onRowClick={handleRowClick}
+                        onEditClick={isAdmin ? handleEditClick : undefined}
+                        onDeleteClick={isAdmin ? handleDeleteClick : undefined}
+                    />
+                </StyledTableContainer>
+            </Paper>
+
+            {editMovie && (
+                <Dialog open={openEditModal} onClose={handleEditClose}>
+                    <DialogTitle>Edit Movie</DialogTitle>
+                    <DialogContent>
+                        <TextField
+                            label="Name"
+                            value={editMovie.name}
+                            onChange={(event) => handleEditInputChange(event, 'name')}
+                            fullWidth
+                            margin="normal"
+                        />
+                        <TextField
+                            label="Genre"
+                            value={editMovie.genre}
+                            onChange={(event) => handleEditInputChange(event, 'genre')}
+                            fullWidth
+                            margin="normal"
+                        />
+                        <TextField
+                            label="Release Year"
+                            value={editMovie.releaseYear}
+                            onChange={(event) => handleEditInputChange(event, 'releaseYear')}
+                            fullWidth
+                            margin="normal"
+                        />
+                        <input
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            id="raised-button-file"
+                            multiple
+                            type="file"
+                            onChange={(event) => handleEditInputChange(event, 'imageFile')}
+                        />
+                        <label htmlFor="raised-button-file">
+                            <Button component="span" >
+                                Upload Image
+                            </Button>
+                        </label>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleEditClose}>Cancel</Button>
+                        <Button onClick={handleEditSave} variant="contained" color="primary">
+                            Save
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
+        </div>
+    );
+};
+
+export default FilmGrid;

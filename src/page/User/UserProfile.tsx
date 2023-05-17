@@ -36,9 +36,15 @@ const UserProfile: React.FC<UserProfileProps> = () => {
     const [favoriteFilms, setFavoriteFilms] = useState<string[]>([]);
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const user = useAppSelector((state: RootState) => state.login.user);
+    const token = useAppSelector((state: RootState) => state.login.token);
+
 
     useEffect(() => {
-        fetch(`${backendUrl}/user/${user?.id}`)
+        fetch(`${backendUrl}/user/${user?.id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
             .then(response => response.json())
             .then(data => {
                 setNewUsername(data.username);
@@ -61,6 +67,7 @@ const UserProfile: React.FC<UserProfileProps> = () => {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(requestBody),
         })

@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import {TextField, Button, Grid, FormHelperText, InputLabel, FormControl, MenuItem, Select} from '@mui/material';
+import {useAppSelector} from "../../app/hooks";
+import {RootState} from "../../app/store";
 
 interface FormValues {
     username: string;
@@ -21,6 +23,7 @@ const schema = yup.object().shape({
 const UserForm = () => {
     const [error,setError] = useState<string|undefined>();
     const [submitting, setSubmitting] = useState(false);
+    const token = useAppSelector((state: RootState) => state.login.token);
     const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
         resolver: yupResolver(schema),
     });
@@ -32,20 +35,23 @@ const UserForm = () => {
             const response = await fetch(`${backendUrl}/user`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(data),
             });
             if (!response.ok) {
-                // throw new Error(`HTTP error! status: ${response.status}`);
                 setError(`HTTP error! status: ${response.statusText}`);
+                alert(`Error: ${response.statusText}`);
+            } else {
+                alert("User successfully added!");
             }
             const json = await response.json();
             console.log(json);
             setError(json);
         } catch (error: any) {
             console.error(error);
-            alert("User successfully added!");
+            alert('Error: ' + error);
             setError(error.value);
         }
         setSubmitting(false);

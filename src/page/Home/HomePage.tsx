@@ -67,7 +67,7 @@ const HomePage = () => {
             <Subtitle>
                 Vítejte na naší filmové databázi. Zde najdete informace o vašich oblíbených filmech a mnoho dalšího.
             </Subtitle>
-            <ButtonStyled variant="contained" color="secondary">
+            <ButtonStyled variant="contained" color="secondary" href="/films">
                 Přejít na databázi
             </ButtonStyled>
         </Root>

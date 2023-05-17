@@ -19,6 +19,7 @@ import PaddedContent from "./PaddedContent";
 import Users from "../User/Users";
 import FilmGrid from "../Film/FilmGrid";
 import Film from "../Film/Film";
+import User from "../User/User";
 
 interface Props {
     onLogout: () => void;
@@ -52,7 +53,7 @@ const RoutesComponent: React.FC<Props> = ({ onLogout }) => {
                 <Route path="/users" element={<PaddedContent><Users /></PaddedContent>} />
                 <Route path="/filmGrid" element={<PaddedContent><FilmGrid /></PaddedContent>} />
                 <Route path="/film/:id" element={<PaddedContent><Film /></PaddedContent>} />
-
+                <Route path="/user/:id" element={<PaddedContent><User /></PaddedContent>} />
             </Routes>
         </BrowserRouter>
     );

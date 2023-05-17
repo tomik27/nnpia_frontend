@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import {TextField, Button, Grid, FormHelperText} from '@mui/material';
+import {useAppSelector} from "../../app/hooks";
+import {RootState} from "../../app/store";
 
 interface FormValues {
     firstName: string;
@@ -19,6 +21,7 @@ const schema = yup.object().shape({
 });
 
 const PersonForm = () => {
+    const token = useAppSelector((state: RootState) => state.login.token);
     const [error,setError] = useState<string|undefined>();
     const [submitting, setSubmitting] = useState(false);
     const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
@@ -32,7 +35,9 @@ const PersonForm = () => {
             const response = await fetch(`${backendUrl}/person`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+
                 },
                 body: JSON.stringify(data),
             });

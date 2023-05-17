@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, TextField, Grid, Paper, Typography } from '@mui/material';
-import LoginForm from "./LoginForm";
+import * as yup from 'yup';
+import {yupResolver} from "@hookform/resolvers/yup";
 
 
 interface RegisterProps {
@@ -20,6 +21,8 @@ const RegisterForm: React.FC<RegisterProps> = ({
                                                    password,
     repeatPassword
                                                }) => {
+
+
     return (
         <form onSubmit={handleRegister}>
                 <Grid container direction="column" alignItems="center" spacing={3}>
