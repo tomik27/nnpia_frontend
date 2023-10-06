@@ -23,7 +23,7 @@ import {createTheme, ThemeProvider} from '@mui/material/styles';
 import MovieIcon from '@mui/icons-material/Movie';
 import {useAppSelector} from "../../app/hooks";
 import {RootState} from "../../app/store";
-import { base64ToArrayBuffer, byteArrayToBase64 } from './../HelpfulFunction/byteToImage';
+import { base64ToArrayBuffer, byteArrayToBase64 } from '../../features/HelpfulFunction/byteToImage';
 
 interface FilmProps {
     id: number;
@@ -75,7 +75,7 @@ const Film = () => {
 
     useEffect(() => {
         fetchFilmData();
-    }, [id]);
+    }, [id]); //zmena pokazde kdyz se id zmeni
 
     const fetchFilmData = () => {
         fetch(`${backendUrl}/film/${id}`)

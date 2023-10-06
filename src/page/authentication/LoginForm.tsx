@@ -1,5 +1,6 @@
-import React from "react";
-import { Button, TextField, Grid, Paper, Typography } from '@mui/material';
+import React, { useState } from "react";
+import { Button, TextField, Grid, Typography } from "@mui/material";
+import * as yup from "yup";
 
 interface LoginFormProps {
     handleLogin: (event: React.FormEvent<HTMLFormElement>) => void;
@@ -16,8 +17,28 @@ const LoginForm: React.FC<LoginFormProps> = ({
                                                  password,
                                                  handleRegisterButtonClick,
                                              }) => {
+    const [usernameError, setUsernameError] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+
+    const schema = yup.object().shape({
+        username: yup.string().required("Username is required"),
+        password: yup.string().required("Password is required"),
+    });
+
+    const validateInput = () => {
+        schema
+            .validate({ username, password })
+            .then(() => {
+                setUsernameError("");
+                setPasswordError("");
+            })
+            .catch((err) => {
+                if (err.path === "username") setUsernameError(err.message);
+                else if (err.path === "password") setPasswordError(err.message);
+            });
+    };
     return (
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleLogin} onChange={validateInput}>
                 <Grid container direction="column" alignItems="center" spacing={3}>
                     <Grid item>
                         <Typography variant="h4">Login</Typography>
@@ -31,6 +52,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
                             value={username}
                             onChange={handleInputChange}
                             required
+                            error={!!usernameError}
+                            helperText={usernameError}
+
                         />
                     </Grid>
                     <Grid item>
@@ -42,6 +66,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
                             value={password}
                             onChange={handleInputChange}
                             required
+                            error={!!passwordError}
+                            helperText={passwordError}
+
                         />
                     </Grid>
                     <Grid item>

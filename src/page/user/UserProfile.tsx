@@ -132,7 +132,7 @@ const UserProfile: React.FC<UserProfileProps> = () => {
                     </Grid>
                 )}
                 <Grid item>
-                    <Typography variant="h5">Favorite Films:</Typography>
+                    <Typography variant="h5">Rating Films:</Typography>
                 </Grid>
                 <Grid item>
                     {favoriteFilms.map((film) => (

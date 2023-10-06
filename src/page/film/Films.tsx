@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Film from "../../components/Film";
-import { base64ToArrayBuffer, byteArrayToBase64 } from './../HelpfulFunction/byteToImage';
+import { base64ToArrayBuffer, byteArrayToBase64 } from '../../features/HelpfulFunction/byteToImage';
 
 interface FilmProps {
     id: number;
@@ -57,6 +57,7 @@ const Films: React.FC = () => {
     }, []);
 
     return (
+        //automaticky poskytována jako druhý argument do callback funkce metody .map(). Tato funkce je používána k iteraci přes pole (v tomto případě films). Index reprezentuje pořadí aktuálního prvku v poli, počínaje nulou
         <div className="films-container">
             {films.map((film, index) => (
                 <Film key={film.id} index={index + 1} {...film} />

@@ -1,5 +1,5 @@
 import React from 'react';
-import RoutesComponent from "./page/Home/Routes";
+import RoutesComponent from "./page/home/Routes";
 
 function App() {
     const handleLogout = () => {

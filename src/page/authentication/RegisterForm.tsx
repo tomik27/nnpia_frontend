@@ -1,8 +1,6 @@
-import React from "react";
+import React, {useState} from "react";
 import { Button, TextField, Grid, Paper, Typography } from '@mui/material';
-import * as yup from 'yup';
-import {yupResolver} from "@hookform/resolvers/yup";
-
+import * as yup from "yup";
 
 interface RegisterProps {
     handleRegister: (event: React.FormEvent<HTMLFormElement>) => void;
@@ -10,7 +8,7 @@ interface RegisterProps {
     email: string;
     username: string;
     password: string;
-    repeatPassword:string;
+    repeatPassword: string;
 }
 
 const RegisterForm: React.FC<RegisterProps> = ({
@@ -19,12 +17,42 @@ const RegisterForm: React.FC<RegisterProps> = ({
                                                    email,
                                                    username,
                                                    password,
-    repeatPassword
+                                                   repeatPassword,
                                                }) => {
+    const [emailError, setEmailError] = useState("");
+    const [usernameError, setUsernameError] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+    const [repeatPasswordError, setRepeatPasswordError] = useState("");
 
+    const schema = yup.object().shape({
+        email: yup.string().required("Email is required").email("Invalid email"),
+        username: yup.string().required("Username is required"),
+        password: yup.string().required("Password is required"),
+        repeatPassword: yup
+            .string()
+            .oneOf([yup.ref("password"), undefined], "Passwords must match"),
+    });
+
+    const validateInput = () => {
+        schema
+            .validate({ email, username, password, repeatPassword })
+            .then(() => {
+                setEmailError("");
+                setUsernameError("");
+                setPasswordError("");
+                setRepeatPasswordError("");
+            })
+            .catch((err) => {
+                if (err.path === "email") setEmailError(err.message);
+                else if (err.path === "username") setUsernameError(err.message);
+                else if (err.path === "password") setPasswordError(err.message);
+                else if (err.path === "repeatPassword")
+                    setRepeatPasswordError(err.message);
+            });
+    };
 
     return (
-        <form onSubmit={handleRegister}>
+        <form onSubmit={handleRegister} onChange={validateInput}>
                 <Grid container direction="column" alignItems="center" spacing={3}>
                     <Grid item>
                         <Typography variant="h4">Register</Typography>
@@ -37,6 +65,8 @@ const RegisterForm: React.FC<RegisterProps> = ({
                             name="email"
                             value={email}
                             onChange={handleInputChange}
+                            error={!!emailError}
+                            helperText={emailError}
                         />
                     </Grid>
                     <Grid item>
@@ -47,6 +77,8 @@ const RegisterForm: React.FC<RegisterProps> = ({
                             name="username"
                             value={username}
                             onChange={handleInputChange}
+                            error={!!usernameError}
+                            helperText={usernameError}
                         />
                     </Grid>
                     <Grid item>
@@ -57,6 +89,8 @@ const RegisterForm: React.FC<RegisterProps> = ({
                             name="password"
                             value={password}
                             onChange={handleInputChange}
+                            error={!!passwordError}
+                            helperText={passwordError}
                         />
                     </Grid>
                     <Grid item>
@@ -67,6 +101,8 @@ const RegisterForm: React.FC<RegisterProps> = ({
                             name="repeatPassword"
                             value={repeatPassword}
                             onChange={handleInputChange}
+                            error={!!repeatPasswordError}
+                            helperText={repeatPasswordError}
                         />
                     </Grid>
                     <Grid item>

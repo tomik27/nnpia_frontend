@@ -21,17 +21,6 @@ const Authentication: React.FC = () => {
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-    const registerSchema = yup.object().shape({
-        email: yup.string().email('Neplatný formát emailu').required('Email je povinný'),
-        username: yup.string().required('Uživatelské jméno je povinné'),
-        password: yup.string().min(6, 'Heslo musí mít minimálně 6 znaků').required('Heslo je povinné'),
-        repeatPassword: yup.string().oneOf([yup.ref('password'), undefined], 'Hesla se musí shodovat')
-    });
-
-    const loginSchema = yup.object().shape({
-        username: yup.string().required('Uživatelské jméno je povinné'),
-        password: yup.string().min(6, 'Heslo musí mít minimálně 6 znaků').required('Heslo je povinné'),
-    });
 
     useEffect(()=> {
         console.log(`State changed in Authentication: ${isLoggedIn}`);

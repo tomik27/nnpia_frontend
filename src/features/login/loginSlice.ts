@@ -18,7 +18,7 @@ const initialState: LoginState = {
     token: localStorage.getItem('token'),
     user: JSON.parse(localStorage.getItem('user') || 'null'),
 };
-
+//functions that take the current state and an action as arguments, and return a new state result
 export const loginSlice = createSlice({
     name: 'login',
     initialState,

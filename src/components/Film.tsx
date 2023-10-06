@@ -7,7 +7,7 @@ interface FilmProps {
     path_to_image: string | null;
     genre: string;
     releaseYear: number;
-    image: string | null;
+    image: string;
     averageRating: number;
     index: number;
 }
