@@ -15,7 +15,7 @@ Filmová databáze je aplikace vytvořená v Reactu a využívající Material U
 
 1. Naklonujte tento repozitář do vašeho lokálního systému.
 2. V terminálu, navigujte do složky projektu a nainstalujte všechny závislosti pomocí `npm install`.
-3. Spusťte aplikaci pomocí `npm start`.
+3. Spusťte aplikaci pomocí `npm run dev`.
 
 ## Jak používat aplikaci
 
